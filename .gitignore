@@ -221,4 +221,7 @@ __marimo__/
 
 *.json
 *.zip
+# Registry metadata cache
 *.json.gz
+# Modules
+reg.*/

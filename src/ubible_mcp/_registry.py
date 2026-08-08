@@ -73,6 +73,10 @@ class RegistrySource(msgspec.Struct):
     priority: int
     test: bool = msgspec.field(default=False)
 
+    @property
+    def name(self) -> str:
+        return sha256(self.url.encode()).hexdigest()[:16]
+
     def get_info(self) -> RegistryInfo | None:
         try:
             resp = requests.get(self.info_url)
@@ -84,7 +88,7 @@ class RegistrySource(msgspec.Struct):
             return msgspec.json.decode(text, type=RegistryInfo)
 
     def get_data(self) -> str | None:
-        hash_name = sha256(self.url.encode()).hexdigest()[:16] + ".json.gz"
+        hash_name = f"{self.name}.json.gz"
         if (Path(".") / hash_name).exists():
             with open(hash_name, "rb") as f_gz, gzip.GzipFile(fileobj=f_gz) as f:
                 data = f.read()
@@ -118,41 +122,41 @@ DEFAULT_REGISTRY_SOURCES: list[RegistrySource] = [
     RegistrySource(
         "https://dl.dropbox.com/s/keg0ptkkalux5fi/registry.zip",
         "https://dl.dropbox.com/s/1odi2f2tyn1oqyx/registry_info.json",
-        False,
         2,
+        False,
     ),
     RegistrySource(
         "http://mybible.zone/repository/registry/registry.zip",
         "http://mybible.zone/repository/registry/registry_info.json",
-        False,
         1,
+        False,
     ),
     RegistrySource(
         "http://mybible.infoo.pro/registry.zip",
         "http://mybible.infoo.pro/registry_info.json",
-        False,
         1,
+        False,
     ),
     RegistrySource(
         "http://mybible.i-t.kz/registry.zip",
         "http://mybible.i-t.kz/registry_info.json",
-        False,
         1,
+        False,
     ),
     RegistrySource(
         "http://myb.1gb.ru/registry.zip",
         "http://myb.1gb.ru/registry_info.json",
-        False,
         1,
+        False,
     ),
     RegistrySource(
-        "http://mph4.ru/registry.zip", "http://mph4.ru/registry_info.json", False, 1
+        "http://mph4.ru/registry.zip", "http://mph4.ru/registry_info.json", 1, False
     ),
     RegistrySource(
         "http://mybible.zone/repository/registry/registry_test.zip",
         "http://mybible.zone/repository/registry/registry_test_info.json",
-        True,
         1,
+        True,
     ),
 ]
 
